@@ -15,17 +15,17 @@ bool	moveAppend(eState& current, std::string& built, unsigned cursor)
 
 bool	haltReset(eState& current, std::string& built, unsigned cursor)
 {
-  (void)built;
   (void)cursor;
   current = S0;
+  built = "";
   return true;
 }
 
 bool	actionError(eState& current, std::string& built, unsigned cursor)
 {
-  (void)built;
   (void)cursor;
   current = S0;
+  built = "";
   return false;
 }
 
