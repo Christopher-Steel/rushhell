@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/steel_c/Code/hell/charon/etape1/FunctionSignature.hpp
+iostream
+-
+
+/home/steel_c/Code/hell/charon/etape1/main.cpp
+cassert
+-
+iostream
+-
+FunctionSignature.hpp
+/home/steel_c/Code/hell/charon/etape1/FunctionSignature.hpp
+
