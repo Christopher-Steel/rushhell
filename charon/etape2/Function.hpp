@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/shared_ptr.hpp>
+
 /* BASE CLASS */
 
 template <typename T>
@@ -12,7 +14,6 @@ public:
 
 	Function(const T &rhs)
 	{
-	  (void)rhs;
 	}
 
 	Function					&operator=(const T &rhs)
@@ -50,19 +51,14 @@ public:
 	template <typename F>
 	Function(F f)
 	{
-		func = new Functor<F>(f);
-	}
-	~Function()
-	{
-		delete (func);
+		func.reset(new Functor<F>(f));
 	}
 	T				operator()()
 	{
 		return ((*func)());
 	};
-
 private:
-	IFunctor		*func;
+	boost::shared_ptr<IFunctor>	func;
 };
 
 /* 1 ARG SPECIALIZATION */
@@ -94,11 +90,7 @@ public:
 	template <typename F>
 	Function(F f)
 	{
-		func = new Functor<F>(f);
-	}
-	~Function()
-	{
-		delete (func);
+		func.reset(new Functor<F>(f));
 	}
 	T				operator()(U arg)
 	{
@@ -106,7 +98,7 @@ public:
 	};
 
 private:
-	IFunctor		*func;
+	boost::shared_ptr<IFunctor> func;
 };
 
 /* 2 ARGS SPECIALIZATION */
@@ -138,11 +130,7 @@ public:
 	template <typename F>
 	Function(F f)
 	{
-		func = new Functor<F>(f);
-	}
-	~Function()
-	{
-		delete (func);
+		func.reset(new Functor<F>(f));
 	}
 	T				operator()(U arg1, V arg2)
 	{
@@ -150,7 +138,7 @@ public:
 	};
 
 private:
-	IFunctor		*func;
+	boost::shared_ptr<IFunctor> func;
 };
 
 /* 3 ARGS SPECIALIZATION */
@@ -182,11 +170,7 @@ public:
 	template <typename F>
 	Function(F f)
 	{
-		func = new Functor<F>(f);
-	}
-	~Function()
-	{
-		delete (func);
+		func.reset(new Functor<F>(f));
 	}
 	T				operator()(U arg1, V arg2, W arg3)
 	{
@@ -194,7 +178,7 @@ public:
 	};
 
 private:
-	IFunctor		*func;
+	boost::shared_ptr<IFunctor> func;
 };
 
 /* 4 ARGS SPECIALIZATION */
@@ -226,11 +210,7 @@ public:
 	template <typename F>
 	Function(F f)
 	{
-		func = new Functor<F>(f);
-	}
-	~Function()
-	{
-		delete (func);
+		func.reset(new Functor<F>(f));
 	}
 	T				operator()(U arg1, V arg2, W arg3, X arg4)
 	{
@@ -238,5 +218,5 @@ public:
 	};
 
 private:
-	IFunctor		*func;
+	boost::shared_ptr<IFunctor> func;
 };
