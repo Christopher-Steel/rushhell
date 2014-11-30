@@ -10,7 +10,7 @@ class FSA
 public:
   FSA();
   virtual ~FSA(void);
-  FSA(const FSA& rhs);
+  FSA(const FSA &rhs);
   FSA		&operator=(const FSA &rhs);
 
   State		&operator[](const std::string &name);

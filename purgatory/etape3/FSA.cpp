@@ -13,6 +13,14 @@ FSA::~FSA(void)
 
 }
 
+FSA::FSA(const FSA &rhs)
+  : _states(rhs._states)
+  , _initialState(rhs._initialState)
+  , _currentState(rhs._currentState)
+{
+
+}
+
 FSA		&FSA::operator=(const FSA &rhs)
 {
   _states = rhs._states;
