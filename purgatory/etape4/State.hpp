@@ -14,7 +14,7 @@ public:
   typedef std::vector<std::string>	LinkSet;
 
   State();
-  State(const std::string &name, bool final = false);
+  explicit State(const std::string &name, bool final = false);
   State(bool final);
   virtual ~State(void);
   State(const State &rhs);

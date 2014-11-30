@@ -22,7 +22,7 @@ public:
 
   bool	operator()(char c) const;
 
-  static const Edge	lambda;
+  static const Edge	Lambda;
 
 private:
   friend std::ostream	&operator<<(std::ostream &, const Edge &);

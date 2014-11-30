@@ -79,8 +79,8 @@ void		FSA::closure(const std::string &state, std::vector<std::string> &out) cons
     return;
   }
   out.push_back(state);
-  if (it->second.hasEdge(Edge::lambda)) {
-    const State::LinkSet	&links = it->second.getLinks(Edge::lambda);
+  if (it->second.hasEdge(Edge::Lambda)) {
+    const State::LinkSet	&links = it->second.getLinks(Edge::Lambda);
 
     for (unsigned i = 0; i < links.size(); ++i) {
       this->closure(links[i], out);
@@ -136,27 +136,42 @@ FSA		FSA::subset(void) const
   StateSetBuilder			ssb;
   StateSetBuildingBrick			brick;
   StateSetBuilder::iterator		it;
+  StateSetBuilder::iterator		itFound;
   std::set<Edge>::const_iterator	alphaIt;
   std::vector<std::string>		move;
+  size_t				itOffset;
 
   State::resetNames();
   brick.marked = false;
   this->closure(_initialState, brick.states);
+  brick.status = State::create();
   ssb.push_back(brick);
-  while ((it = std::find_if(ssb.begin(), ssb.end(), StateSetBuildingBrick::isUnmarked))
-	 != ssb.end()) {
-    it->marked = true;
+  while (true) {
+    for (it = ssb.begin(); it != ssb.end(); ++it) {
+      if (StateSetBuildingBrick::isUnmarked(*it)) {
+	break;
+      }
+    }
+    if (it == ssb.end()) {
+      break;
+    }
+    (*it).marked = true;
     brick.marked = false;
     for (alphaIt = _alphabet.begin(); alphaIt != _alphabet.end(); ++alphaIt) {
       move.clear();
-      this->move(it->states, *alphaIt, move);
+      this->move((*it).states, *alphaIt, move);
       brick.states.clear();
       this->closure(move, brick.states);
-      if (std::find(ssb.begin(), ssb.end(), brick) == ssb.end()) {
+      std::sort(brick.states.begin(), brick.states.end());
+      if ((itFound = std::find(ssb.begin(), ssb.end(), brick)) != ssb.end()) {
+	it->status.link(*alphaIt, itFound->status.getName());
+      } else {
 	brick.status = State::create();
+	itOffset = it - ssb.begin();
 	ssb.push_back(brick);
+	it = ssb.begin() + itOffset;
+	it->status.link(*alphaIt, brick.status.getName());
       }
-      it->status.link(*alphaIt, brick.status.getName());
     }
   }
   return this->_generateFromBuilder(ssb);
@@ -245,6 +260,7 @@ FSA		FSA::_generateFromBuilder(StateSetBuilder& builder) const
     }
     fsa.addState(brick.status);
   }
+  fsa.setInitialState(_initialState);
   return fsa;
 }
 
@@ -252,8 +268,7 @@ FSA		FSA::_generateFromBuilder(StateSetBuilder& builder) const
 
 bool	FSA::StateSetBuildingBrick::operator==(const StateSetBuildingBrick &rhs) const
 {
-  return ((status.getName() == rhs.status.getName() && status.getName() != "")
-	  || states == rhs.states);
+  return (states == rhs.states);
 }
 
 bool	FSA::StateSetBuildingBrick::isUnmarked(const StateSetBuildingBrick &brick)

@@ -1,6 +1,6 @@
 #include "Edge.hpp"
 
-const Edge	Edge::lambda(-1);
+const Edge	Edge::Lambda(-1);
 
 Edge::Edge(void)
   : _c(0)
@@ -75,6 +75,10 @@ bool	Edge::operator()(char c) const
 // DOT conversion
 std::ostream	&operator<<(std::ostream &ostream, const Edge &edge)
 {
-  ostream << edge._c;
+  if (edge._c == -1) {
+    ostream << "lambda";
+  } else {
+    ostream << edge._c;
+  }
   return ostream;
 }
