@@ -84,6 +84,7 @@ void	unitTestState(void)
     // this is supposed to throw but if it doesn't the assert will fail
     assert(s0[e2] == "");
   } catch (const std::out_of_range &oor) {
+    (void)oor;
   }
   assert(s1[e2] == s2.getName());
   s1.unlink(e2);
@@ -91,6 +92,7 @@ void	unitTestState(void)
     // this is supposed to throw but if it doesn't the assert will fail
     assert(s1[e2] == "");
   } catch (const std::out_of_range &oor) {
+    (void)oor;
   }
   std::cout << "State passed unit tests" << std::endl;
 }
@@ -104,6 +106,7 @@ void	unitTestFSA(void)
     // this is supposed to throw but if it doesn't the assert will fail
     assert(fsa["S0"].getName() == "S1");
   } catch (const std::out_of_range &oor) {
+    (void)oor;
   }
   // testing a single final state FSA
   fsa.addState(state);

@@ -91,13 +91,15 @@ bool		FSA::consumeEdge(const Edge &edge)
     }
   } catch (const std::out_of_range &oor) {
     _currentState = _initialState;
+    (void)oor;
     // if the state was reset because of an invalid edge it is possible
     // that the edge that was used was invalid at the currentState but
     // is valid for the reset state. if this isn't tested for then we
     // wouldn't be able to detect "cd" in "dccdd"
     try {
       _currentState = _states[_currentState][edge];
-    } catch (const std::out_of_range &oor) {
+    } catch (const std::out_of_range &oor2) {
+      (void)oor2;
     }
   }
   return reset;
