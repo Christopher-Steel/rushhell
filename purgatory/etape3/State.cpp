@@ -1,4 +1,3 @@
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -38,6 +37,7 @@ State&			State::operator=(const State &rhs)
 {
   _name = rhs._name;
   _final = rhs._final;
+  _links = rhs._links;
   return *this;
 }
 
@@ -123,4 +123,9 @@ State			State::create(bool final)
   ss << "S" << _nameCounter;
   ++_nameCounter;
   return State(ss.str(), final);
+}
+
+void			State::resetNames(void)
+{
+  _nameCounter = 0;
 }

@@ -37,6 +37,7 @@ public:
   void			unlink(const Edge &edge);
 
   static State		create(bool final = false);
+  static void		resetNames(void);
 
 private:
   std::string		_name;

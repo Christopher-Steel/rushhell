@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 
 #include "Matcher.hpp"
@@ -30,9 +29,7 @@ bool	Matcher::find(const std::string &haystack)
 bool	Matcher::find(const std::string &haystack, int &count)
 {
   count = 0;
-  std::cout << "searching in a haystack => \"" << haystack << "\"" << std::endl;
   for (unsigned i = 0; i < haystack.length(); ++i) {
-    std::cout << "testing edge " << haystack[i] << std::endl;
     if (_fsa.consumeEdge(haystack[i])) {
       ++count;
     }

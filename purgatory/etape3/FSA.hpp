@@ -13,7 +13,7 @@ public:
   FSA(const FSA& rhs);
   FSA		&operator=(const FSA &rhs);
 
-  const State	&operator[](const std::string &name) const;
+  State		&operator[](const std::string &name);
 
   void		addState(const State &state);
   void		setInitialState(const std::string &state);
@@ -24,6 +24,8 @@ public:
 
   bool		consumeEdge(char c);
   bool		consumeEdge(const Edge &edge);
+
+  void		reset(void);
 
   static FSA	generateFromNeedle(const std::string &needle);
 
