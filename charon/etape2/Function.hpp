@@ -12,6 +12,7 @@ public:
 
 	Function(const T &rhs)
 	{
+	  (void)rhs;
 	}
 
 	Function					&operator=(const T &rhs)

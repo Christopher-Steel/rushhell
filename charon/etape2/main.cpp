@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include <boost/bind.hpp>
 
@@ -10,6 +11,18 @@ static int	zerofunction();
 static int	onefunction(int);
 static int	charfunction(char);
 
+struct	Callable
+{
+  Callable() {}
+
+  ~Callable() {}
+
+  int	operator()() {
+    std::cout << "callable" << std::endl;
+    return (0);
+  }
+};
+
 /* Des tests pour l'étape I.2 */
 int main(void)
 {
@@ -19,13 +32,16 @@ int main(void)
   Function<int()>	f3(&zerofunction);
   Function<int()>	f4 = boost::bind(&onefunction, 150);
   Function<int(char)>	cf = boost::bind(&charfunction, _1);
+  Function<Callable>	fnCall(callable);
 
   assert(f1(50) == 50);
   assert(f2(100) == 100);
   assert(f3() == 0);
   assert(f4() == 150);
   assert(cf('c') == 'c');
+  assert(fnCall() == 0);
 
+  std::cout << "Function passed unit tests" << std::endl;
   return 0;
 }
 

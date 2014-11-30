@@ -8,7 +8,6 @@ static int	onefunction(int);
 static int	twofunction(int, int);
 static int	threefunction(int, int, int);
 static int	fourfunction(int, int, int, int);
-static int	fivefunction(int, int, int, int, int);
 
 /* Des tests pour l'étape I.1 */
 int	main()
@@ -18,15 +17,13 @@ int	main()
   FunctionSignature<int(int, int)>::type		f2 = &twofunction;
   FunctionSignature<int(int, int, int)>::type		f3 = &threefunction;
   FunctionSignature<int(int, int, int, int)>::type	f4 = &fourfunction;
-  FunctionSignature<int(int, int, int, int, int)>::type	f5 = &fivefunction;
 
   assert(f0() == 0);
   assert(f1(1) == 1);
   assert(f2(1, 2) == 3);
   assert(f3(1, 2, 3) == 6);
   assert(f4(1, 2, 3, 4) == 10);
-  assert(f5(1, 2, 3, 4, 5) == 15);
-
+  std::cout << "FunctionSignature passed unit tests" << std::endl;
   return 0;
 }
 
