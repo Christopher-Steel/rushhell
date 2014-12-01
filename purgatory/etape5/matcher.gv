@@ -1,9 +1,0 @@
-digraph G {
-  S0 -> S1 [label="n"];
-  S1 -> S2 [label="e"];
-  S2 -> S3 [label="e"];
-  S3 -> S4 [label="d"];
-  S4 -> S5 [label="l"];
-  S5 -> S6 [label="e"];
-  S6 [style="filled" color="red"]
-}

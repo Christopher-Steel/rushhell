@@ -45,6 +45,7 @@ public:
 
   void			fillAlphabet(std::set<Edge> &alphabet) const;
 
+  State			cloneAppend(const std::string &suffix) const;
   static State		create(bool final = false);
   static void		resetNames(void);
 

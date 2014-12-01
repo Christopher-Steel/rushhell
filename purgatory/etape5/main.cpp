@@ -167,10 +167,9 @@ void	unitTestMatcher(FSA &fsa)
   std::cout << "Matcher passed unit tests" << std::endl;
 }
 
-void	testNFAtoDFA(void)
+void	buildNFA(FSA &nfa)
 {
   // Building NFA for expression (a|b)*abb
-  FSA		fsa;
   State		states[11];
   unsigned	i;
 
@@ -193,12 +192,16 @@ void	testNFAtoDFA(void)
   states[8].link('b', std::string("S9"));
   states[9].link('b', std::string("S10"));
   for (i = 0; i < 11; ++i) {
-    fsa.addState(states[i]);
+    nfa.addState(states[i]);
   }
-  fsa.setInitialState(std::string("S0"));
+  nfa.setInitialState(std::string("S0"));
+}
+
+void	testClosureAndMove(FSA &nfa)
+{
   // Closure test
   std::vector<std::string>	closure;
-  fsa.closure(closure);
+  nfa.closure(closure);
   assert(closure.size() == 5);
   assert(closure[0] == "S0");
   assert(closure[1] == "S1");
@@ -207,13 +210,13 @@ void	testNFAtoDFA(void)
   assert(closure[4] == "S7");
   // Move test
   std::vector<std::string>	move;
-  fsa.move(closure, Edge('a'), move);
+  nfa.move(closure, Edge('a'), move);
   assert(move.size() == 2);
   assert(move[0] == "S3");
   assert(move[1] == "S8");
   std::cout << "Move passed unit tests" << std::endl;
   closure.clear();
-  fsa.closure(move, closure);
+  nfa.closure(move, closure);
   assert(closure.size() == 7);
   std::sort(closure.begin(), closure.end());
   assert(closure[0] == "S1");
@@ -226,73 +229,83 @@ void	testNFAtoDFA(void)
   std::cout << "Closure passed unit tests" << std::endl;
 }
 
+bool	openOFStream(const std::string path, std::ofstream &ofs)
+{
+  ofs.open(path.c_str());
+  if (ofs) {
+    return true;
+  }
+  std::cerr << "Failed to open output file " << path << std::endl;
+  return false;
+}
+
 void	testDOT(FSA &fsa)
 {
-  std::string	path("./matcher.dot");
-  std::ofstream	ofs(path.c_str());
+  std::ofstream	ofs;
 
-  if (!ofs) {
-    std::cerr << "Failed to open output file " << path << std::endl;
+  if (!openOFStream("./matcher.dot", ofs)) {
     std::cout << "DOT conversion could not pass tests" << std::endl;
     return;
   }
   ofs << fsa;
 }
 
-void	testNFAtoDFADOT(void)
+void	testNFAtoDFADOT(FSA &nfa, FSA &dfa)
 {
-  std::string	path("./NFA.dot");
-  std::ofstream	ofs(path.c_str());
+  std::ofstream	ofs;
 
-  if (!ofs) {
-    std::cerr << "Failed to open output file " << path << std::endl;
+  if (!openOFStream("./NFA.dot", ofs)) {
     std::cout << "NFA creation could not pass tests" << std::endl;
     return;
   }
-  // Building NFA for expression (a|b)*abb
-  FSA		fsa;
-  State		states[11];
-  unsigned	i;
-
-  State::resetNames();
-  for (i = 0; i < 11; ++i) {
-    states[i] = State::create((i == 10));
-    std::cout << "Created state " << states[i].getName() << std::endl;
-  }
-  states[0].link(Edge::Lambda, std::string("S1"));
-  states[0].link(Edge::Lambda, std::string("S7"));
-  states[1].link(Edge::Lambda, std::string("S2"));
-  states[1].link(Edge::Lambda, std::string("S4"));
-  states[2].link('a', std::string("S3"));
-  states[3].link(Edge::Lambda, std::string("S6"));
-  states[4].link('b', std::string("S5"));
-  states[5].link(Edge::Lambda, std::string("S6"));
-  states[6].link(Edge::Lambda, std::string("S1"));
-  states[6].link(Edge::Lambda, std::string("S7"));
-  states[7].link('a', std::string("S8"));
-  states[8].link('b', std::string("S9"));
-  states[9].link('b', std::string("S10"));
-  for (i = 0; i < 11; ++i) {
-    fsa.addState(states[i]);
-  }
-  fsa.setInitialState(std::string("S0"));
-  ofs << fsa;
+  ofs << nfa;
   // Conversion to DFA
   ofs.close();
-  path = "DFA.dot";
-  ofs.open(path.c_str());
-  if (!ofs) {
-    std::cerr << "Failed to open output file " << path << std::endl;
+  if (!openOFStream("./DFA.dot", ofs)) {
     std::cout << "DFA creation could not pass tests" << std::endl;
     return;
   }
-  FSA dfa = fsa.subset();
+  dfa = nfa.subset();
   ofs << dfa;
+}
+
+void	testAppend(FSA &lhs, FSA &rhs, FSA &appended)
+{
+  std::ofstream ofs;
+
+  if (!openOFStream("./appended.dot", ofs)) {
+    std::cout << "Append could not pass tests" << std::endl;
+    return;
+  }
+  appended = FSA::append(lhs, rhs);
+  ofs << appended;
+  std::cout << "Append passed tests" << std::endl;
+}
+
+void	testMerge(FSA &lhs, FSA &rhs, bool methodTwo, FSA &merged)
+{
+  std::ofstream ofs;
+  std::string	path = (!methodTwo ? "./merged1.dot" : "./merged2.dot");
+
+  if (!openOFStream(path, ofs)) {
+    std::cout << "Merge one could not pass tests" << std::endl;
+    return;
+  }
+  merged = FSA::merge(lhs, rhs, methodTwo);
+  ofs << merged;
+  std::cout << "Merge passed tests" << std::endl;
 }
 
 int	main(void)
 {
   FSA	fsa;
+  FSA	nfa;
+  FSA	dfa;
+  FSA	appended;
+  FSA	merged1;
+  FSA	merged2;
+  FSA	lexernfa;
+  FSA	lexerdfa;
 
   unitTestEdge();
   unitTestState();
@@ -300,7 +313,11 @@ int	main(void)
   unitTestFSAGenerate(fsa);
   unitTestMatcher(fsa);
   testDOT(fsa);
-  testNFAtoDFA();
-  testNFAtoDFADOT();
+  buildNFA(nfa);
+  testClosureAndMove(nfa);
+  testNFAtoDFADOT(nfa, dfa);
+  testAppend(fsa, dfa, appended);
+  testMerge(dfa, fsa, false, merged1);
+  testMerge(dfa, fsa, true, merged2);
   return 0;
 }

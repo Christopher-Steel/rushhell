@@ -48,6 +48,8 @@ public:
   void		reset(void);
 
   static FSA	generateFromNeedle(const std::string &needle);
+  static FSA	append(const FSA &lhs, const FSA &rhs);
+  static FSA	merge(const FSA &lhs, const FSA &rhs, bool alternative = false);
 
 private:
   struct StateSetBuildingBrick
@@ -64,11 +66,14 @@ private:
   friend std::ostream &operator<<(std::ostream &, const FSA &);
 
   FSA		_generateFromBuilder(StateSetBuilder& builder) const;
+  void		_appendixify(const FSA &rhs, const std::string &appendix);
+  void		_redirectAcceptors(const Edge &edge, const FSA &source, const std::string &target);
 
   std::map<std::string, State>	_states;
   std::set<Edge>		_alphabet;
   std::string			_initialState;
   std::string			_currentState;
+  std::set<std::string>		_acceptingStates;
 };
 std::ostream	&operator<<(std::ostream &ostream, const FSA &fsa);
 

@@ -142,6 +142,22 @@ void			State::fillAlphabet(std::set<Edge> &alphabet) const
   }
 }
 
+State			State::cloneAppend(const std::string &suffix) const
+{
+  State			st(_name + suffix, _final);
+  std::map<Edge, LinkSet>::const_iterator	it;
+  LinkSet::const_iterator			linkIt;
+
+  for (it = _links.begin(); it != _links.end(); ++it) {
+    const LinkSet	&states = it->second;
+
+    for (linkIt = states.begin(); linkIt != states.end(); ++linkIt) {
+      st.link(it->first, *linkIt + suffix);
+    }
+  }
+  return st;
+}
+
 State			State::create(bool final)
 {
   std::stringstream	ss;

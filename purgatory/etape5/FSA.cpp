@@ -19,6 +19,7 @@ FSA::FSA(const FSA &rhs)
   : _states(rhs._states)
   , _initialState(rhs._initialState)
   , _currentState(rhs._currentState)
+  , _acceptingStates(rhs._acceptingStates)
 {
 
 }
@@ -28,6 +29,7 @@ FSA		&FSA::operator=(const FSA &rhs)
   _states = rhs._states;
   _initialState = rhs._initialState;
   _currentState = rhs._currentState;
+  _acceptingStates = rhs._acceptingStates;
   return *this;
 }
 
@@ -45,6 +47,9 @@ void		FSA::addState(const State &state)
 {
   _states[state.getName()] = state;
   state.fillAlphabet(_alphabet);
+  if (state.isFinal()) {
+    _acceptingStates.insert(state.getName());
+  }
 }
 
 void		FSA::setInitialState(const std::string &state)
@@ -239,6 +244,39 @@ FSA		FSA::generateFromNeedle(const std::string &needle)
   return fsa;
 }
 
+FSA		FSA::append(const FSA &lhs, const FSA &rhs)
+{
+  FSA		newFSA = lhs;
+  std::string	appendix("a");
+  std::set<std::string>::const_iterator		it;
+
+  newFSA._appendixify(rhs, appendix);
+  newFSA._redirectAcceptors(Edge::Lambda, lhs, rhs._initialState + appendix);
+  for (it = rhs._acceptingStates.begin(); it != rhs._acceptingStates.end(); ++it) {
+    newFSA._acceptingStates.insert(*it + appendix);
+  }
+  return newFSA;
+}
+
+FSA		FSA::merge(const FSA &lhs, const FSA &rhs, bool alternative)
+{
+  FSA		newFSA = lhs;
+  std::string	appendix("m");
+  State		init(newFSA._initialState + "_" + rhs._initialState + appendix);
+
+  init.link(Edge::Lambda, lhs._initialState);
+  init.link(Edge::Lambda, rhs._initialState + appendix);
+  newFSA.addState(init);
+  newFSA._appendixify(rhs, appendix);
+  if (alternative) {
+    State	acceptor("Final" + init.getName(), true);
+
+    newFSA._redirectAcceptors(Edge::Lambda, newFSA, acceptor.getName());
+    newFSA.addState(acceptor);
+  }
+  return newFSA;
+}
+
 FSA		FSA::_generateFromBuilder(StateSetBuilder& builder) const
 {
   std::map<std::string, State>::const_iterator	it;
@@ -262,6 +300,28 @@ FSA		FSA::_generateFromBuilder(StateSetBuilder& builder) const
   }
   fsa.setInitialState(_initialState);
   return fsa;
+}
+
+void		FSA::_appendixify(const FSA &rhs, const std::string &appendix)
+{
+  std::map<std::string, State>::const_iterator	it;
+
+  for (it = rhs._states.begin(); it != rhs._states.end(); ++it) {
+    this->addState(it->second.cloneAppend(appendix));
+  }
+}
+
+void		FSA::_redirectAcceptors(const Edge &edge, const FSA &source, const std::string &target)
+{
+  std::set<std::string>::const_iterator		it;
+
+  for (it = source._acceptingStates.begin(); it != source._acceptingStates.end(); ++it) {
+    State	&st = _states[*it];
+
+    st.setFinal(false);
+    st.link(edge, target);
+  }
+  _acceptingStates.clear();
 }
 
 // StateSetBuildingBrick
